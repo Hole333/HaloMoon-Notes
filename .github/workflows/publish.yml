@@ -29,6 +29,8 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: site/package-lock.json
+      - name: Prepare Markdown metadata
+        run: node site/external-notes/scripts/manage-notes.mjs prepare
       - run: npm ci --no-audit --no-fund
         working-directory: site
       - run: npm run build

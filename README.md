@@ -1,38 +1,36 @@
 # HaloMoon Notes
 
-HaloMoon 的独立 Markdown 学习笔记仓库。
+Write ordinary Markdown files inside a category folder. The first H1 is the title, and the parent folder is the category and tag.
 
-## 最快使用方式
+```markdown
+# My note title
 
-双击：
-
-```text
-manage-notes.cmd
+Write the note body here.
 ```
 
-Linux：
+Example:
+
+```text
+notes/structured_light/measurement.md
+```
+
+## One-click publish
+
+Windows:
+
+```text
+publish-notes.cmd
+```
+
+Linux:
 
 ```bash
-chmod +x manage-notes.sh
-./manage-notes.sh
+chmod +x publish-notes.sh
+./publish-notes.sh
 ```
 
-可以直接新建、删除、同步或拉取笔记。新建笔记会优先使用 VS Code 打开 Markdown 文件；保存完成后，脚本会提交并推送 GitHub，GitHub Actions 自动更新博客。
+The publisher automatically creates the required metadata, commits every Markdown change, pushes GitHub, and starts the blog deployment. Deleting a Markdown file and running the same command removes its blog page.
 
-## 分类与网址映射
+## Note manager
 
-目录就是分类，Markdown 文件路径就是博客路径：
-
-```text
-notes/linux/network.md
-→ https://www.halomoon.cn/notes/linux/network/
-```
-
-多级目录同样有效：
-
-```text
-notes/programming/python/asyncio.md
-→ https://www.halomoon.cn/notes/programming/python/asyncio/
-```
-
-设置 Front Matter 中的 `draft: true` 后不会生成公开页面。
+Use `manage-notes.cmd` or `./manage-notes.sh` only when you want the interactive create/delete menu.
