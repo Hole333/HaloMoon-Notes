@@ -42,8 +42,14 @@ const formatDate = (date = new Date()) => [date.getFullYear(), String(date.getMo
 const formatStamp = (date = new Date()) => formatDate(date).replaceAll('-', '') + '-' + [date.getHours(), date.getMinutes(), date.getSeconds()].map((value) => String(value).padStart(2, '0')).join('');
 
 function prepareFile(file) {
-	const content = readFileSync(file, 'utf8').replaceAll('\r\n', '\n');
-	if (/^---\n[\s\S]*?\n---\n/.test(content)) return false;
+	const original = readFileSync(file, 'utf8').replaceAll('\r\n', '\n');
+	const content = original.replace(/^[\t ]+(?=!\[[^\]]*\]\([^)]+\)\s*$)/gm, '');
+	if (/^---\n[\s\S]*?\n---\n/.test(content)) {
+		if (content === original) return false;
+		writeFileSync(file, content, 'utf8');
+		console.log(`Normalized: ${relative(root, file)}`);
+		return true;
+	}
 	const heading = content.match(/^#\s+(.+)$/m);
 	const title = heading?.[1].trim().replaceAll('\\_', '_') || basename(file, extname(file)).replaceAll('-', ' ');
 	const body = (heading ? content.replace(heading[0], '') : content).trimStart();
