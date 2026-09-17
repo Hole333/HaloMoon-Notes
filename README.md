@@ -1,18 +1,16 @@
-# HaloMoon Notes
+# HaloMoon Markdown Articles
 
-Write ordinary Markdown files inside a category folder. The first H1 is the title, and the parent folder is the category and tag.
+Write standard Markdown files inside a category folder. Every file is published in the website's **Articles** section.
 
 ```markdown
-# My note title
+# Article title
 
-Write the note body here.
+Write the article body here.
 ```
 
-Example:
+The first H1 becomes the article title. The parent folder becomes the category and tag. The file path becomes `/blog/category/file-name/`.
 
-```text
-notes/structured_light/measurement.md
-```
+Supported content includes GFM tables, task lists, strikethrough, footnotes, fenced code, local and remote images, inline math, and display math.
 
 ## One-click publish
 
@@ -25,12 +23,7 @@ publish-notes.cmd
 Linux:
 
 ```bash
-chmod +x publish-notes.sh
 ./publish-notes.sh
 ```
 
-The publisher automatically creates the required metadata, commits every Markdown change, pushes GitHub, and starts the blog deployment. Deleting a Markdown file and running the same command removes its blog page.
-
-## Note manager
-
-Use `manage-notes.cmd` or `./manage-notes.sh` only when you want the interactive create/delete menu.
+The publisher prepares metadata, commits every Markdown change, pushes GitHub, and starts deployment. Deleting a Markdown file and running the same command removes its article page.
