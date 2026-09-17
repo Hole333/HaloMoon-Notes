@@ -10,6 +10,7 @@ const notesRoot = join(root, 'notes');
 process.chdir(root);
 const prompt = createInterface({ input, output });
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const categoryPattern = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 const ask = async (label, fallback = '') =>
 	(await prompt.question(`${label}${fallback ? ` (default: ${fallback})` : ""}: `)).trim() || fallback;
 const quote = (value) => `'${value.replaceAll("'", "''")}'`;
@@ -63,7 +64,7 @@ async function newNote() {
 	const choice = await ask('Choose a category number, or type a new lowercase category name');
 	const index = Number(choice) - 1;
 	const category = Number.isInteger(index) && index >= 0 && index < categories.length ? categories[index] : choice.toLowerCase();
-	if (!slugPattern.test(category)) throw new Error('Category names may contain lowercase letters, numbers, and single hyphens only.');
+	if (!categoryPattern.test(category)) throw new Error('Category names may contain lowercase letters, numbers, hyphens, and underscores only.');
 	const categoryDirectory = join(notesRoot, category);
 	mkdirSync(categoryDirectory, { recursive: true });
 
