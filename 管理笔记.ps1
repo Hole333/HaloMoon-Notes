@@ -81,8 +81,15 @@ draft: false
 "@ | Set-Content -Encoding utf8 -LiteralPath $file
 
     Write-Host "Created: $file" -ForegroundColor Green
-    Start-Process -FilePath $file
-    Read-Host 'After saving the note, press Enter to sync and publish'
+    $vscode = Get-Command code -ErrorAction SilentlyContinue
+    if ($vscode) {
+        Write-Host 'Opening the Markdown note in VS Code. Save it, then close the editor tab/window to continue.' -ForegroundColor Cyan
+        & $vscode.Source --wait $file
+        if ($LASTEXITCODE -ne 0) { throw 'VS Code exited with an error.' }
+    } else {
+        Start-Process -FilePath $file
+        Read-Host 'After saving the note, press Enter to sync and publish'
+    }
     $content = Get-Content -Raw -LiteralPath $file
     $body = [regex]::Replace($content, '^---[\s\S]*?---', '')
     $body = [regex]::Replace($body, '<!--[\s\S]*?-->', '').Trim()
