@@ -1,0 +1,52 @@
+name: Publish notes to HaloMoon
+
+on:
+  push:
+    branches: [main]
+    paths: ['notes/**']
+  workflow_dispatch:
+
+concurrency:
+  group: halomoon-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout blog
+        uses: actions/checkout@v4
+        with:
+          repository: Hole333/HolyLinux
+          path: site
+      - name: Checkout notes
+        uses: actions/checkout@v4
+        with:
+          path: site/external-notes
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+      - run: tar -czf site.tar.gz -C site/dist .
+      - name: Configure SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.HALOMOON_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.HALOMOON_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+      - name: Upload and activate release
+        env:
+          DEPLOY_HOST: ${{ secrets.HALOMOON_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.HALOMOON_DEPLOY_USER }}
+        run: |
+          scp site.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/home/$DEPLOY_USER/site.tar.gz"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "sudo /usr/local/sbin/deploy-halomoon $GITHUB_SHA"
