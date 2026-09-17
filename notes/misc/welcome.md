@@ -25,4 +25,4 @@ notes/linux/network.md
 
 ## 快速同步
 
-双击仓库根目录的 `管理笔记.cmd`，即可新建、删除或同步笔记。
+双击仓库根目录的 `manage-notes.cmd`，即可新建、删除或同步笔记。

@@ -7,7 +7,14 @@ HaloMoon 的独立 Markdown 学习笔记仓库。
 双击：
 
 ```text
-管理笔记.cmd
+manage-notes.cmd
+```
+
+Linux：
+
+```bash
+chmod +x manage-notes.sh
+./manage-notes.sh
 ```
 
 可以直接新建、删除、同步或拉取笔记。新建笔记会优先使用 VS Code 打开 Markdown 文件；保存完成后，脚本会提交并推送 GitHub，GitHub Actions 自动更新博客。
