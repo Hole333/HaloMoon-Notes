@@ -166,12 +166,14 @@ cat /proc/sys/kernel/printk
 sudo sh -c "echo 7 4 1 7 > /proc/sys/kernel/printk"
 ```
 
+```text
 7    4    1    7
 │  │  │  │
 │  │  │  └─ 默认控制台日志级别（default_console_loglevel）
 │  │  └──── 控制台最小日志级别（minimum_console_loglevel）
 │  └─────── 默认消息日志级别（default_message_loglevel）
 └────────── 当前控制台日志级别（console_loglevel）
+```
 
 ### 内核模块相关命令
 
