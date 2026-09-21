@@ -19,6 +19,18 @@ const run = (command, args, accepted = [0]) => {
 	if (!accepted.includes(result.status)) throw new Error(`${command} ${commandArgs.join(' ')} failed with exit code ${result.status}`);
 	return result.status;
 };
+const runGitWithRetry = (args, attempts = 3) => {
+	let status = 1;
+	for (let attempt = 1; attempt <= attempts; attempt += 1) {
+		status = run('git', args, [0, 1]);
+		if (status === 0) return;
+		if (attempt < attempts) {
+			console.log(`GitHub connection failed; retrying in ${attempt * 3} seconds...`);
+			spawnSync(process.platform === 'win32' ? 'timeout' : 'sleep', process.platform === 'win32' ? ['/t', String(attempt * 3), '/nobreak'] : [String(attempt * 3)], { cwd: root, stdio: 'ignore', shell: false });
+		}
+	}
+	throw new Error('GitHub is unreachable. Your local commit is preserved. Retry with: publish-notes.cmd');
+};
 const tryEditor = (command, args) => {
 	const result = spawnSync(command, args, { cwd: root, stdio: 'inherit', shell: false });
 	if (result.error?.code === 'ENOENT') return false;
@@ -77,7 +89,7 @@ function prepareNotes() {
 }
 
 async function syncNotes() {
-	run('git', ['pull', '--rebase', '--autostash']);
+	runGitWithRetry(['pull', '--rebase', '--autostash']);
 	prepareNotes();
 	run('git', ['add', '-A']);
 	if (run('git', ['diff', '--cached', '--quiet'], [0, 1]) === 0) {
@@ -85,7 +97,7 @@ async function syncNotes() {
 		return;
 	}
 	run('git', ['commit', '-m', `notes: publish ${formatStamp()}`]);
-	run('git', ['push']);
+	runGitWithRetry(['push']);
 	console.log('Published. GitHub Actions is updating the blog.');
 }
 
@@ -141,7 +153,7 @@ async function menu() {
 	if (choice === '1') return newNote();
 	if (choice === '2') return syncNotes();
 	if (choice === '3') return deleteNote();
-	if (choice === '4') return run('git', ['pull', '--rebase', '--autostash']);
+	if (choice === '4') return runGitWithRetry(['pull', '--rebase', '--autostash']);
 	throw new Error('Invalid selection.');
 }
 
@@ -151,7 +163,7 @@ try {
 	else if (action === 'new') await newNote();
 	else if (action === 'delete') await deleteNote();
 	else if (action === 'sync') await syncNotes();
-	else if (action === 'pull') run('git', ['pull', '--rebase', '--autostash']);
+	else if (action === 'pull') runGitWithRetry(['pull', '--rebase', '--autostash']);
 	else if (action === 'prepare') prepareNotes();
 	else if (action === 'menu') await menu();
 	else throw new Error('Unknown action. Use --help for usage.');
