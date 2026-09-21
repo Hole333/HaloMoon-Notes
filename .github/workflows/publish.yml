@@ -1,4 +1,4 @@
-name: Publish notes to HaloMoon
+name: Validate notes
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: halomoon-notes-production
-  cancel-in-progress: false
+  group: halomoon-notes-validation
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -35,34 +35,3 @@ jobs:
         working-directory: site
       - run: npm run build
         working-directory: site
-      - run: tar -czf site.tar.gz -C site/dist .
-      - name: Configure SSH
-        env:
-          DEPLOY_KEY: ${{ secrets.HALOMOON_DEPLOY_KEY }}
-          KNOWN_HOSTS: ${{ secrets.HALOMOON_KNOWN_HOSTS }}
-        run: |
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
-          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
-      - name: Upload and activate release
-        env:
-          DEPLOY_HOST: ${{ secrets.HALOMOON_DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.HALOMOON_DEPLOY_USER }}
-        run: |
-          SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -o TCPKeepAlive=yes -o IPQoS=throughput"
-          for attempt in 1 2 3; do
-            timeout 30s ssh $SSH_OPTS "$DEPLOY_USER@$DEPLOY_HOST" "pkill -u $DEPLOY_USER -f 'scp -t /home/$DEPLOY_USER/site.tar.gz|sftp-server' || true; rm -f /home/$DEPLOY_USER/site.tar.gz" || true
-            if timeout 180s scp -O $SSH_OPTS site.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/home/$DEPLOY_USER/site.tar.gz"; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              echo "SCP failed after 3 attempts." >&2
-              exit 1
-            fi
-            sleep $((attempt * 5))
-          done
-          LOCAL_SHA=$(sha256sum site.tar.gz | awk '{print $1}')
-          REMOTE_SHA=$(timeout 30s ssh $SSH_OPTS "$DEPLOY_USER@$DEPLOY_HOST" "sha256sum /home/$DEPLOY_USER/site.tar.gz" | awk '{print $1}')
-          test "$LOCAL_SHA" = "$REMOTE_SHA"
-          timeout 120s ssh $SSH_OPTS "$DEPLOY_USER@$DEPLOY_HOST" "sudo /usr/local/sbin/deploy-halomoon $GITHUB_SHA"
