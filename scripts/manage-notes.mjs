@@ -93,7 +93,16 @@ async function syncNotes() {
 	prepareNotes();
 	run('git', ['add', '-A']);
 	if (run('git', ['diff', '--cached', '--quiet'], [0, 1]) === 0) {
-		console.log('No note changes to publish.');
+		console.log('No file changes. Checking whether deployment needs a republish...');
+		const workflow = spawnSync('gh', ['workflow', 'run', 'publish.yml', '--repo', 'Hole333/HaloMoon-Notes'], { cwd: root, stdio: 'inherit', shell: false });
+		if (!workflow.error && workflow.status === 0) {
+			console.log('Republish workflow started. GitHub Actions is updating the blog.');
+			return;
+		}
+		console.log('GitHub CLI is unavailable; creating a republish marker commit.');
+		runGitWithRetry(['commit', '--allow-empty', '-m', 'chore: republish notes']);
+		runGitWithRetry(['push']);
+		console.log('Republish marker pushed. GitHub Actions is updating the blog.');
 		return;
 	}
 	run('git', ['commit', '-m', `notes: publish ${formatStamp()}`]);
