@@ -13,9 +13,10 @@ const categoryPattern = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 const ask = async (label) => (await prompt.question(`${label}: `)).trim();
 const quote = (value) => `'${value.replaceAll("'", "''")}'`;
 const run = (command, args, accepted = [0]) => {
-	const result = spawnSync(command, args, { cwd: root, stdio: 'inherit', shell: false });
+	const commandArgs = command === 'git' ? ['-c', 'http.version=HTTP/1.1', ...args] : args;
+	const result = spawnSync(command, commandArgs, { cwd: root, stdio: 'inherit', shell: false });
 	if (result.error) throw result.error;
-	if (!accepted.includes(result.status)) throw new Error(`${command} ${args.join(' ')} failed with exit code ${result.status}`);
+	if (!accepted.includes(result.status)) throw new Error(`${command} ${commandArgs.join(' ')} failed with exit code ${result.status}`);
 	return result.status;
 };
 const tryEditor = (command, args) => {
