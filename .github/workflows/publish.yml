@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: halomoon-production
-  cancel-in-progress: true
+  group: halomoon-notes-production
+  cancel-in-progress: false
 
 jobs:
   deploy:
