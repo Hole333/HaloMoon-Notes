@@ -1,5 +1,11 @@
-# (FUCK_6) linux驱动初探---设备树
-
+---
+title: '(FUCK_6) linux驱动初探---设备树'
+description: '设备树？'
+created: '2026-09-28'
+updated: '2026-09-28'
+tags: ['linux']
+draft: false
+---
 ## 设备树？
 
 设备树(Device Tree)，将这个词分开就是“设备”和“树”，描述设备树的文件叫做DTS(Device Tree Source)，这个 DTS 文件采用树形结构描述板级设备，也就是开发板上的设备信息，比如CPU数量、 内存基地址、IIC接口上接了哪些设备、SPI接口上接了哪些设备等等，
