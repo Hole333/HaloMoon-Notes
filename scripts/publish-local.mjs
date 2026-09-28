@@ -95,8 +95,8 @@ try {
 
   const archive = join(root, 'site-local.tar.gz');
   run('tar', ['-czf', archive, '-C', join(blog, 'dist'), '.'], blog);
-  const commit = await capture('git', ['rev-parse', 'HEAD'], blog, 10000);
   const localHash = await sha256(archive);
+  const commit = createHash('sha1').update(localHash).digest('hex');
   const destination = user + '@' + host;
   const sshArgs = [
     '-i', key, '-o', 'IdentitiesOnly=yes',
