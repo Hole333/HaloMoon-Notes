@@ -1,5 +1,5 @@
 ---
-title: '(FUCK_6) linux驱动初探---设备树+点亮LED'
+title: '(FUCK_7) linux驱动初探---设备树+点亮LED'
 description: '设备树节点添加'
 created: '2026-09-29'
 updated: '2026-09-29'
