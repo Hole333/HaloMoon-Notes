@@ -56,7 +56,7 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3308-roc-cc.dtb
 1. ” / “: 根节点
 2. node-name@unit-address: 节点名字@设备地址/寄存器首地址
 
-      通常会使用标签的形式和上述节点表示进行组合
+   通常会使用标签的形式和上述节点表示进行组合
 
 ```
 cpu0:cpu@0
@@ -69,8 +69,7 @@ cpu0:cpu@0
 * 字符串: 例如compatible = "rockchip,rk3568";
 * 32位无符号整数: 例如 reg = <0>; 上述代码设置reg属性的值为0
 
-      也可以设置为一组数值reg = <0 0x123456 100>;
-
+  也可以设置为一组数值reg = <0 0x123456 100>;
 * 字符串列表: 属性值也可以为字符串列表，字符串和字符串之间采用“,”隔开 compatible = "rockchip,rk3568-evb ", "rockchip,rk3568";
 
 #### 标准属性
