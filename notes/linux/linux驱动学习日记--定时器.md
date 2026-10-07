@@ -6,27 +6,6 @@ updated: '2026-10-07'
 tags: ['linux']
 draft: false
 ---
-```c
-// 定时器中断回调
-static void fp_led_timer_callback(struct timer_list *t_node)
-{
-    unsigned long flags;
-    int timeperiod;
-    static int status= 0x01;
-    struct led_dts_type *dev = from_timer(dev, t_node, t_node);
-    gpio_set_value(dev->led_gpio, status);
-    status = !status;
-    // 自旋锁 锁一下，避免写入的时候竞争
-    spin_lock_irqsave(&dev->spin_lock, flags);
-    timeperiod = dev->period;
-    // 更新定时器超时值
-    mod_timer(t_node, jiffies_64 + msecs_to_jiffies(timeperiod));
-    spin_unlock_irqrestore(&dev->spin_lock, flags);
-}
-```
-
-
-
 ## 内核时间管理
 
 与freeRTOS以及ucos操作系统一致，Linux在实际运行的时候也需要一个系统时钟，而时钟的最底层来源就是SOC的硬件定时器，通常会使用一个通用定时器。系统使用定时中断进行计时，比如 100HZ , 1000HZ就是系统的节拍率。而这个节拍率我们可以进行设置
