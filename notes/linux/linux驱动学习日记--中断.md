@@ -1,8 +1,8 @@
 ---
 title: '(FUCK_13) linux驱动初探--中断'
 description: '简介'
-created: '2026-10-09'
-updated: '2026-10-09'
+created: '2026-10-10'
+updated: '2026-10-10'
 tags: ['linux']
 draft: false
 ---
